@@ -304,6 +304,7 @@ class IHM(Tk,Verification,Logapli):
             self.counter.set((self.ligne / self.ws.nrows) * 100)
             self.ligne += 1
             print("Ligne : ", self.ligne)
+            
             self.after(2, self.g)
         else:
             return self.tab
