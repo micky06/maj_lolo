@@ -1,9 +1,10 @@
 
 
-import mysql.connector
+import MySQLdb
 import os
 import time
 #from GUI import *
+
 
 class Verification():
 
@@ -41,9 +42,10 @@ class Verification():
             self.mdp = params[3]
             self.dat = params[4]
             self.Controle += 1
-            
+
             print("Récupération des parametres")
-        liimd = [self.log, self.ips, self.ids, self.mdp, self.dat, self.Controle]
+        liimd = [self.log, self.ips, self.ids,
+                 self.mdp, self.dat, self.Controle]
         return liimd
 
 
@@ -52,11 +54,12 @@ class Verification():
 # ************************************************************************
 
     def verif_reseau(self):
-        self.config = {'user': self.ids, 'password': self.mdp, 'host': self.ips, 'database': self.dat}
+        self.config = {'user': self.ids, 'password': self.mdp,
+                       'host': self.ips, 'database': self.dat}
         print(self.config)
         try:
-            cnx = mysql.connector.connect(**self.config)
-            cur = cnx.cursor(buffered=True)
+            cnx = MySQLdb.connect(**self.config)
+            cur = cnx.cursors.Cursor(buffered=True)
             cur.close()
             cnx.close()
             print("Serveur : OK")
@@ -90,4 +93,3 @@ class Verification():
         else:
             # prevoir la creation du fichier
             print(" Fichier référence MANQUANT..")
-
