@@ -256,7 +256,8 @@ class IHM(Tk, Verification, Logapli):
             print(fini, fini1)
             if fini and fini1:
                 c = Compare_log_nsrtgv()
-                c.compare(tab, tab1)
+                comp = c.compare(tab, tab1)
+                print(comp)
             else:
                 self.after(1000, wait)
 
