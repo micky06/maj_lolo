@@ -247,11 +247,15 @@ class IHM(Tk, Verification, Logapli):
         i = self.verifReference("References.mic", "NSRTGV")
         i()
 
-        def wait_ref():
-            i(True)
-            if self.fini:
-                print("Tableau", i(True))
-                self.fini = False
+        def wait():
+            nonlocal i, j
+            fini, tab = i(True)
+            fini1, tab1 = j(True)
+            print(fini, fini1)
+            if fini and fini1:
+                c = Compare_log_nsrtgv()
+                comp = c.compare(tab, tab1)
+                print(comp)
             else:
                 self.after(1000, wait_ref)
         wait_ref()
