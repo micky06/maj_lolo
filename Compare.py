@@ -1,11 +1,9 @@
 class Compare_log_nsrtgv(object):
 
     def compare(self, list_log, list_nsrtgv):
-        list_log = list_log
-        list_nsrtgv = list_nsrtgv
         long = len(list_nsrtgv), len(list_log)
         deplace = 0
-        print ("longueur au depard =   ", long)
+        print("longueur au depard =   ", long)
         for i, l in enumerate(list_log[1:]):
             ok, lign = self.boucle(list_nsrtgv, l)
             if not ok:
@@ -26,9 +24,8 @@ class Compare_log_nsrtgv(object):
                     for x in lign:
                         if l['emplacement'] != list_nsrtgv[x]['emplacement']:
                             deplace += 1
-      
-        return {'deplace': deplace, 'nouveau': self.delOrNew(list_log, list_nsrtgv), 'supprime': self.delOrNew(list_log, list_nsrtgv, "del"), 'long': long}
 
+        return {'deplace': deplace, 'nouveau': self.delOrNew(list_log, list_nsrtgv), 'supprime': self.delOrNew(list_log, list_nsrtgv, "del"), 'long': long}
 
     def boucle(self, tab, dico):
         lign = []
@@ -40,7 +37,6 @@ class Compare_log_nsrtgv(object):
                 else:
                     lign.append(i + 1)
         return (ok, lign)
-
 
     def delOrNew(self, tab1, tab2, del_or_new="new"):
         if del_or_new == "del":

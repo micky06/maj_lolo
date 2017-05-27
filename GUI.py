@@ -245,18 +245,22 @@ class IHM(Tk, Verification, Logapli):
         # nsrtgv.lien_logapli = "References.mic"
         # i = ihm.verifReference(self.log, "SYMBOLES")
         i = self.verifReference("References.mic", "NSRTGV")
+        j = self.verifLogapli("References2.mic", "NSRTGV")
         i()
+        j()
 
-        def wait_ref():
-            i(True)
-            if self.fini:
-                print("Tableau", i(True))
-                self.fini = False
+        def wait():
+            nonlocal i, j
+            fini, tab = i(True)
+            fini1, tab1 = j(True)
+            print(fini, fini1)
+            if fini and fini1:
+                c = Compare_log_nsrtgv()
+                c.compare(tab, tab1)
             else:
-                self.after(1000, wait_ref)
-        wait_ref()
-        #comp = Compare_log_nsrtgv()
-        #print(comp.compare(list_log, tgv))
+                self.after(1000, wait)
+
+        return wait
 
     def Fermer(self):
         self.f1 = True
@@ -301,10 +305,10 @@ class IHM(Tk, Verification, Logapli):
         ligne = 1
         print(name, ws.nrows)
 
-        self.fini = False
+        fini = False
 
         def g(info=False):
-            nonlocal ws, ligne, tab
+            nonlocal ws, ligne, tab, fini
             if not info:
                 if ligne < ws.nrows:
                     tab = self.logapli.readRowsTgv(ws, ligne, tab)
@@ -313,13 +317,45 @@ class IHM(Tk, Verification, Logapli):
                     print("Ligne : ", ligne)
                     self.after(2, g)
                 else:
-                    self.fini = True
+                    fini = True
             else:
-                print("dans info")
-                if self.fini:
-                    return tab
+                if fini:
+                    return (fini, tab)
                 else:
-                    print("pas encore fini")
+                    return (fini, None)
+
+        return g
+
+    def verifLogapli(self, lien, name):
+        # if name == "NSRTGV":
+        # counter = self.count_reference
+        # else:
+        counter = self.count_logapli
+
+        self.logapli.lien_logapli = lien
+        ws = self.logapli.sheetName(name)
+        tab = []
+        ligne = 1
+        print(name, ws.nrows)
+
+        fini = False
+
+        def g(info=False):
+            nonlocal ws, ligne, tab, fini
+            if not info:
+                if ligne < ws.nrows:
+                    tab = self.logapli.readRowsTgv(ws, ligne, tab)
+                    counter.set((ligne / ws.nrows) * 100)
+                    ligne += 1
+                    print("Ligne : ", ligne)
+                    self.after(2, g)
+                else:
+                    fini = True
+            else:
+                if fini:
+                    return (fini, tab)
+                else:
+                    return (fini, None)
 
         return g
 
@@ -337,7 +373,8 @@ ihm.verif()
 
 # ihm.verifLogapli()
 
-ihm.Verif_Maj()
+v = ihm.Verif_Maj()
+v()
 
 
 ihm.mainloop()
