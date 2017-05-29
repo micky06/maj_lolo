@@ -250,20 +250,12 @@ class IHM(Tk, Verification, Logapli):
         j()
 
         def wait():
-            nonlocal i, j, self
+            nonlocal i, j
             fini, tab = i(True)
             fini1, tab1 = j(True)
             print(fini, fini1)
             if fini and fini1:
                 c = Compare_log_nsrtgv()
-
-                def refresh():
-                    nonlocal self
-                    self.count_maj.set(c.counter)
-                    print(self.count_maj.get())
-                    if self.count_maj.get() < 99:
-                        self.after(16, refresh)
-                refresh()
                 comp = c.compare(tab, tab1)
                 print(comp)
 
