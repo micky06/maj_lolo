@@ -1,4 +1,10 @@
+import time
+
+
 class Compare_log_nsrtgv(object):
+
+    def __init__(self):
+        self.counter = 0
 
     def compare(self, list_log, list_nsrtgv):
         long = len(list_nsrtgv), len(list_log)
@@ -24,6 +30,8 @@ class Compare_log_nsrtgv(object):
                     for x in lign:
                         if l['emplacement'] != list_nsrtgv[x]['emplacement']:
                             deplace += 1
+            time.sleep(0.01)
+            self.counter = (float(i) / float(len(list_log))) * 100
 
         return {'deplace': deplace, 'nouveau': self.delOrNew(list_log, list_nsrtgv), 'supprime': self.delOrNew(list_log, list_nsrtgv, "del"), 'long': long}
 
