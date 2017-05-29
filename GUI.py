@@ -245,7 +245,7 @@ class IHM(Tk, Verification, Logapli):
         # nsrtgv.lien_logapli = "References.mic"
         # i = ihm.verifReference(self.log, "SYMBOLES")
         i = self.verifReference("References.mic", "NSRTGV")
-        j = self.verifLogapli("References2.mic", "NSRTGV")
+        j = self.verifReference("References2.mic", "NSRTGV")
         i()
         j()
 
@@ -297,8 +297,10 @@ class IHM(Tk, Verification, Logapli):
 
     def verifReference(self, lien, name):
         if name == "NSRTGV":
+            readRows = self.readRowsTgv
             counter = self.count_reference
         else:
+            readRows = self.readRowsLog
             counter = self.count_logapli
 
         self.logapli.lien_logapli = lien
@@ -313,40 +315,7 @@ class IHM(Tk, Verification, Logapli):
             nonlocal ws, ligne, tab, fini
             if not info:
                 if ligne < ws.nrows:
-                    tab = self.logapli.readRowsTgv(ws, ligne, tab)
-                    counter.set((ligne / ws.nrows) * 100)
-                    ligne += 1
-                    print("Ligne : ", ligne)
-                    self.after(2, g)
-                else:
-                    fini = True
-            else:
-                if fini:
-                    return (fini, tab)
-                else:
-                    return (fini, None)
-
-        return g
-
-    def verifLogapli(self, lien, name):
-        # if name == "NSRTGV":
-        # counter = self.count_reference
-        # else:
-        counter = self.count_logapli
-
-        self.logapli.lien_logapli = lien
-        ws = self.logapli.sheetName(name)
-        tab = []
-        ligne = 1
-        print(name, ws.nrows)
-
-        fini = False
-
-        def g(info=False):
-            nonlocal ws, ligne, tab, fini
-            if not info:
-                if ligne < ws.nrows:
-                    tab = self.logapli.readRowsTgv(ws, ligne, tab)
+                    tab = readRows(ws, ligne, tab)
                     counter.set((ligne / ws.nrows) * 100)
                     ligne += 1
                     print("Ligne : ", ligne)
