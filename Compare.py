@@ -30,7 +30,6 @@ class Compare_log_nsrtgv(object):
                     for x in lign:
                         if l['emplacement'] != list_nsrtgv[x]['emplacement']:
                             deplace += 1
-            time.sleep(0.01)
             self.counter = (float(i) / float(len(list_log))) * 100
 
         return {'deplace': deplace, 'nouveau': self.delOrNew(list_log, list_nsrtgv), 'supprime': self.delOrNew(list_log, list_nsrtgv, "del"), 'long': long}
