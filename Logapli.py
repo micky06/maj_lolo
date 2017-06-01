@@ -5,7 +5,6 @@ import xlrd
 import collections
 from Compare import *
 import time
-#from GUI import *
 
 
 class Logapli(object):
@@ -21,7 +20,6 @@ class Logapli(object):
                        "BTGV4": "MECA", "00000041059_006": "FILTRE"}
 
     def openWorkbook(self):
-        print("dans open workbook self lien_logapli =  ", self.lien_logapli)
         return xlrd.open_workbook(self.lien_logapli)
 
     def sheetName(self, name):
@@ -53,7 +51,7 @@ class Logapli(object):
             d['bdl'] = self.bdl[0]
             tab.append(d)
 
-        print("... RECUPERATION TERMINEE logapli.......", tab[0])
+        #print("... RECUPERATION TERMINEE logapli.......")
         return tab
 
     def nbr(self):

@@ -30,8 +30,7 @@ def main():
     v.verif_reseau()
     v.verif_logapli()
     v.verif_reference()
-    print(v.Controle)
-
+  
     ihm = IHM(None)
     if v.Controle == 3:
         etat = "normal"

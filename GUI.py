@@ -1,10 +1,12 @@
 
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 from tkinter.messagebox import *
 from Verif import Verification
 from Logapli import *
 from Compare import *
+from Reference import *
 import time
 import asyncio
 
@@ -31,7 +33,6 @@ class IHM(Tk, Verification, Logapli):
 
     def variable(self):
         liimd = Verification.verif_param(self)
-        print("########################## ==>  ", liimd)
         self.log = liimd[0]
         self.ips = liimd[1]
         self.ids = liimd[2]
@@ -54,7 +55,7 @@ class IHM(Tk, Verification, Logapli):
 
         self.marge(0)
         self.bmaj = Button(self, text=" Verifier la Maj", width=int(self.l // 70),
-                           height=2, relief=RAISED, state=self.etat, command=self.Verif_Maj)
+                           height=2, relief=RAISED, state=self.etat, command= self.bouton)
         self.bmaj.grid(row=16, column=1, sticky='WE', padx=3, pady=5)
         self.marge(2)
         bparam = Button(self, text=" Parametre", width=int(self.l // 70),
@@ -86,11 +87,10 @@ class IHM(Tk, Verification, Logapli):
         self.ligne(13)
         self.ligne(14)
 
-        # Wait for 5 seconds
-        # time.sleep(15)
 
-        print(self.state())
-
+    def bouton(self):
+        v = self.Verif_Maj()
+        v() 
     def marge(self, column):
         Label(self, text=' ', width=int(self.l // 100)
               ).grid(row=0, column=column, sticky='EW')
@@ -136,7 +136,6 @@ class IHM(Tk, Verification, Logapli):
 
     def geoliste(self, g):
         r = [i for i in range(0, len(g)) if not g[i].isdigit()]
-        print(g, r)
         return (int(g[0:r[0]])), int(
             g[r[0] + 1:r[1]]), int(g[r[1] + 1:r[2]]), int(g[r[2] + 1:])
 
@@ -224,8 +223,8 @@ class IHM(Tk, Verification, Logapli):
                       self.idserveur.get() + "\n" + self.mdpserveur.get() + "\n" + self.nomtable.get() + "\n")
         fichier.flush()
         fichier.close
-        print(self.lienlogapli.get(), "\n", self.ipserveur.get(), "\n",
-              self.idserveur.get(), "\n", self.mdpserveur.get(), "\n", self.nomtable.get())
+        #print(self.lienlogapli.get(), "\n", self.ipserveur.get(), "\n",
+        #      self.idserveur.get(), "\n", self.mdpserveur.get(), "\n", self.nomtable.get())
 
         # self.update_idletasks()
 
@@ -238,31 +237,64 @@ class IHM(Tk, Verification, Logapli):
         self.Fermer()
 
     def Verif_Maj(self):
-        # list_log =[]
-        # logapli = Logapli()
-        # nsrtgv = Logapli()
-        # logapli.lien_logapli = self.log
-        # nsrtgv.lien_logapli = "References.mic"
-        # i = ihm.verifReference(self.log, "SYMBOLES")
-        i = self.verifReference("References.mic", "NSRTGV")
-        j = self.verifReference("References2.mic", "NSRTGV")
+        self.bmaj.config(state="disabled")
+        self.val_maj = 0
+
+        i = self.verifReference("References2.mic", "SYMBOLES") # essai MAISON
+#        i = self.verifReference(self.log, "SYMBOLES") # essai TRAVAIL
+        j = self.verifReference("References.mic", "NSRTGV")
         i()
         j()
 
+
         def wait():
+            
             nonlocal i, j
             fini, tab = i(True)
             fini1, tab1 = j(True)
-            print(fini, fini1)
             if fini and fini1:
                 c = Compare_log_nsrtgv()
+
+                def refresh():
+                    
+                    nonlocal self
+                    self.count_maj.set(c.counter)
+                    #print(self.count_maj.get())
+                    if self.count_maj.get() < 99:
+                        self.after(16, refresh)
+                refresh()
                 comp = c.compare(tab, tab1)
-                print(comp)
+                nv = comp.get("nouveau")
+                sup = comp.get("supprime")
+                dep = comp.get("deplace")
+                for valeur in comp.values():
+                    self.val_maj = self.val_maj + valeur
+
+                if self.val_maj !=0:
+                    creat = CreateXls(tab)
+                    if messagebox.askyesno("Résultat : ","Les changements suivants ont été trouvés :\n\n" +
+                                        "Nouvelle(s) pièce(s) : %s\n" %nv +
+                                        "Pièce(s) supprimée(s) : %s\n" %sup +
+                                        "Pièce(s) déplacée(s) : %s\n" %dep +
+                                        "\n \n Voulez-vous mettre à jour \n la Base De Données ? "):
+                        self.bmaj.config(state="normal")
+                        creat.creation()
+                        print(" lancer la mise a jour de la bdd + maj le fichier reference.mic")
+                    else:
+                        self.bmaj.config(state="normal")
+                        print(" fini....")
+                    
+                else:
+                    messagebox.showinfo("Résultat : ", "Aucun changement n'a été trouvé\n \n Il est INUTILE de mettre à jour la Base De Donéées...")
+                    self.bmaj.config(state="normal")
+                    print("Pas de MAJ a faire")
 
             else:
                 self.after(1000, wait)
 
         return wait
+
+
 
     def Fermer(self):
         self.f1 = True
@@ -270,15 +302,14 @@ class IHM(Tk, Verification, Logapli):
         return self.f1
 
     def verif(self):
-        print(self.count_verif.get())
         if self.count_verif.get() == 1:
             self.v.verif_param()
             self.count_verif.set(25)
         elif self.count_verif.get() == 25:
-            # self.v.verif_reseau()
+#            self.v.verif_reseau() # A retirer pour essai MAISON
             self.count_verif.set(50)
         elif self.count_verif.get() == 50:
-            self.v.verif_logapli()
+#            self.v.verif_logapli() # A retirer pour essai MAISON
             self.count_verif.set(75)
         elif self.count_verif.get() == 75:
             self.v.verif_reference()
@@ -287,7 +318,8 @@ class IHM(Tk, Verification, Logapli):
             if self.v.Controle == 3:
                 self.bmaj.config(state="normal")
             else:
-                self.bmaj.config(state="disabled")
+                self.bmaj.config(state="normal") # essai MAISON
+ #               self.bmaj.config(state="disabled") # essai TRAVAIL
             return
         elif self.count_verif.get() == 0:
             self.count_verif.set(1)
@@ -300,14 +332,14 @@ class IHM(Tk, Verification, Logapli):
             readRows = self.readRowsTgv
             counter = self.count_reference
         else:
-            readRows = self.readRowsLog
+            readRows = self.readRowsTgv # essai MAISON
+ #           readRows = self.readRowsLog # essai TRAVAIL
             counter = self.count_logapli
 
         self.logapli.lien_logapli = lien
         ws = self.logapli.sheetName(name)
         tab = []
         ligne = 1
-        print(name, ws.nrows)
 
         fini = False
 
@@ -318,23 +350,60 @@ class IHM(Tk, Verification, Logapli):
                     tab = readRows(ws, ligne, tab)
                     counter.set((ligne / ws.nrows) * 100)
                     ligne += 1
-                    print("Ligne : ", ligne)
-                    self.after(2, g)
+                    self.after(1, g)
                 else:
                     fini = True
+                    print(" jai fini reference....", fini)
             else:
                 if fini:
                     return (fini, tab)
+                    
                 else:
                     return (fini, None)
 
         return g
 
-    def verifref(self, lien1, name1):
+#    def verifLogapli(self, lien, name):
+        #if name == "NSRTGV":
+        #    counter = self.count_reference
+        #else:
+#        counter = self.count_logapli
 
-        self.lien, self.name = lien1, name1
-        print(self.lien, self.name)
-        self.verifReference(self.lien, self.name)
+#        self.logapli.lien_logapli = lien
+#        ws = self.logapli.sheetName(name)
+#        tab = []
+#        ligne = 1
+        #print(name, ws.nrows)
+
+#        fini = False
+
+#        def g():
+#            nonlocal ws, ligne, tab, fini
+#            if not fini:
+#                if ligne < ws.nrows:
+#                    tab = self.logapli.readRowsLog(ws, ligne, tab)
+#                    counter.set((ligne / ws.nrows) * 100)
+#                    ligne += 1
+                    #print("Ligne : ", ligne)
+#                    self.after(1, g)
+#                else:
+#                    fini = True
+#                    print(" jai fini logapli....", fini)
+#            else:
+#                if fini:
+#                    print("ligne 370", fini)
+#                    return (fini, tab)
+#                else:
+#                    print("ligne 373", fini)
+#                    return (fini, None)
+
+#        return g
+
+#    def verifref(self, lien1, name1):
+#
+#        self.lien, self.name = lien1, name1
+        #print(self.lien, self.name)
+#        self.verifReference(self.lien, self.name)
 
         # return self.tab
 
@@ -344,8 +413,8 @@ ihm.verif()
 
 # ihm.verifLogapli()
 
-v = ihm.Verif_Maj()
-v()
+#v = ihm.Verif_Maj()
+#v()
 
 
 ihm.mainloop()

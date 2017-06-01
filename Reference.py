@@ -10,8 +10,11 @@ import xlwt
 # creation d'un classeur et d'une feuille
 class CreateXls():
 
-    def __init__(self, logapli):
-        self.logapli = logapli
+    """ Creation d'un fichier xls sous l'extention .mic qui servira
+         de base de reference pour le comparer au fichier Logapli """
+
+    def __init__(self, tab):
+        self.tab = tab
         self.classeur = Workbook()
         self.feuille = self.classeur.add_sheet("NSRTGV")
 
@@ -38,25 +41,23 @@ class CreateXls():
         self.feuille.col(3).width = 5080
         self.feuille.col(4).width = 2400
         # remplissage du tableau
-        ligne = 0
-        for ligne in range(self.logapli.nbr()):
-            if self.logapli.bdl[ligne] == "yes":
+ 
+        for ligne,v in enumerate(self.tab[1:]):
+            if v['bdl'] == "yes":
                 STYLE = self.style3
             else:
                 STYLE = self.style2
-            self.feuille.write(ligne + 1, 0, self.logapli.zone[ligne], STYLE)
+            self.feuille.write(ligne + 1, 0, v['zone'], STYLE)
             self.feuille.write(
-                ligne + 1, 1, self.logapli.symbole[ligne], STYLE)
-            self.feuille.write(ligne + 1, 2, self.logapli.nom[ligne], STYLE)
+                ligne + 1, 1, v['symbole'], STYLE)
+            self.feuille.write(ligne + 1, 2, v['nom'], STYLE)
             self.feuille.write(
-                ligne + 1, 3, self.logapli.emplacement[ligne], STYLE)
-            self.feuille.write(ligne + 1, 4, self.logapli.bdl[ligne], STYLE)
+                ligne + 1, 3, v['emplacement'], STYLE)
+            self.feuille.write(ligne + 1, 4, v['bdl'], STYLE)
         try:
-            self.classeur.save("References.mic")
+            self.classeur.save("References3.mic")
         except PermissionError:
 
-            print(""" Veuillez fermer le fichier "References.xls"....""")
+            print(""" Veuillez fermer le fichier "References.mic"....""")
 
         print("creation du fichier EXCEL terminé....")
-
-# sauvegarde du classeur

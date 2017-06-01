@@ -14,7 +14,7 @@ class Verification():
         try:
             f = open("param", "r")
             lignes = f.readlines()
-            print("Ouverture param", lignes)
+            print("Ouverture param")
             f.close
         except FileNotFoundError:
             self.log = r"\\S58nelct120\mr_nel_technicentre_zones_blanches\LOGAPLI\LOGAPLI.xls"
@@ -34,7 +34,7 @@ class Verification():
             params = []
             for ligne in lignes:
                 params.append(ligne[:-1])
-            print(params)
+            #print(params)
             self.log = r'%s' % params[0]
             self.ips = params[1]
             self.ids = params[2]
@@ -53,7 +53,7 @@ class Verification():
 
     def verif_reseau(self):
         self.config = {'user': self.ids, 'password': self.mdp, 'host': self.ips, 'database': self.dat}
-        print(self.config)
+        #print(self.config)
         try:
             cnx = mysql.connector.connect(**self.config)
             cur = cnx.cursor(buffered=True)
