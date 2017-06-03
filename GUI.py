@@ -7,8 +7,11 @@ from Verif import Verification
 from Logapli import *
 from Compare import *
 from Reference import *
+from Bdd import *
 import time
 import asyncio
+import image_base_64
+from ctypes import windll
 
 
 class IHM(Tk, Verification, Logapli):
@@ -17,6 +20,11 @@ class IHM(Tk, Verification, Logapli):
 
         self.entrees = []
         Tk.__init__(self, parent)
+
+        """ Icon Windows app"""
+        img = PhotoImage(file=r'img/icon.png')
+        self.tk.call('wm', 'iconphoto', self._w, img)
+        
         Verification.__init__(self)
         Logapli.__init__(self)
         self.parent = parent
@@ -25,10 +33,12 @@ class IHM(Tk, Verification, Logapli):
         self.etat = "disabled"
         self.vpb = 1
         self.list_log = []
+
+
         self.v = Verification()
         self.nsrtgv = Logapli()
         self.logapli = Logapli()
-        self.variable()
+        # self.variable()
         self.initialize()
 
     def variable(self):
@@ -42,7 +52,7 @@ class IHM(Tk, Verification, Logapli):
     def initialize(self):
 
         self.grid()
-        self.attributes("-toolwindow", 1)
+
         self.title('Mise à Jour de la Borne')  # Ajout d'un titre
         self.update_idletasks()
         width = self.winfo_screenwidth()
@@ -60,7 +70,7 @@ class IHM(Tk, Verification, Logapli):
         self.marge(2)
         bparam = Button(self, text=" Parametre", width=int(self.l // 70),
                         height=2, relief=RAISED, command=self.param)
-        bparam.grid(row=16, column=3, sticky='WE', padx=3, pady=5)
+        bparam.grid(row=16, column=3, sticky='E', padx=3, pady=5)
         self.marge(4)
         bquit = Button(self, text=" Quitter", width=int(self.l // 70),
                        height=2, relief=RAISED, command=self.destroy)
@@ -70,6 +80,8 @@ class IHM(Tk, Verification, Logapli):
         self.ligne(1)
         self.ligne(2)
         self.ligne(3)
+        self.logo()
+        self.logo_tgv()
         self.titre(4, "Vérification des paramètres : ")
         self.progress_bar(4, "verif")
         self.ligne(5)
@@ -95,13 +107,27 @@ class IHM(Tk, Verification, Logapli):
         Label(self, text=' ', width=int(self.l // 100)
               ).grid(row=0, column=column, sticky='EW')
 
-    def ligne(self, row):
+    def ligne(self, row, bg=None):
         Label(self, text=' ', height=int(self.h // 200)
               ).grid(row=row, column=1, sticky='EW')
 
     def titre(self, line, titre):
         Label(self, text=titre, font=("Arial", int(self.l // 100),
                                       "bold italic")).grid(row=line, column=0, columnspan=3, sticky=EW)
+    
+    def logo(self):
+        logo_png = PhotoImage(file ="deployment.gif")
+        photo = Label(self, image=logo_png)
+        photo.image = logo_png
+        photo.grid(row=1, column=1, rowspan=2)
+    
+    def logo_tgv(self):
+        logo_png = PhotoImage(file ="tgv_duplex.gif")
+        photo = Label(self, image=logo_png)
+        photo.image = logo_png
+        photo.grid(row=2, column=3, columnspan=2)
+
+
 
     def progress_bar(self, line, name):
 
@@ -146,7 +172,7 @@ class IHM(Tk, Verification, Logapli):
             self.f1 = False
             self.fen1 = Toplevel(self)
             self.fen1.protocol("WM_DELETE_WINDOW", self.Fermer)
-            self.fen1.attributes("-toolwindow", 1)
+            # self.fen1.attributes("-toolwindow", 1)
 
             self.fen1.title('Paramètres')
             self.fen1.update_idletasks()
@@ -177,6 +203,7 @@ class IHM(Tk, Verification, Logapli):
             Label(self.fen1, text='         Nom de la Base DATA :').grid(
                 row=13, column=0, sticky=E)
 
+            self.variable()
             self.lienlogapli = Entry(self.fen1, width=65)  # LIEN LOGAPLI
             self.lienlogapli.insert(0, self.log)
             self.ipserveur = Entry(self.fen1, width=45)  # IP SERVEUR MYSQL
@@ -222,19 +249,19 @@ class IHM(Tk, Verification, Logapli):
         fichier.write(self.lienlogapli.get() + "\n" + self.ipserveur.get() + "\n" +
                       self.idserveur.get() + "\n" + self.mdpserveur.get() + "\n" + self.nomtable.get() + "\n")
         fichier.flush()
-        fichier.close
-        #print(self.lienlogapli.get(), "\n", self.ipserveur.get(), "\n",
-        #      self.idserveur.get(), "\n", self.mdpserveur.get(), "\n", self.nomtable.get())
-
-        # self.update_idletasks()
-
+        fichier.close()
         v = Verification()
         v.verif_param()
         v.verif_reseau()
         v.verif_logapli()
         if v.Controle == 3:
             self.bmaj.config(state="normal")
-        self.Fermer()
+            self.Fermer()
+        else:
+            messagebox.showerror("PROBLEME de paramètre", "Au moins 1 de vos paramètres n'est pas VALABLE...\n Merci de les vérifier.", parent=self.fen1)
+            self.Fermer()
+            self.param()
+        return
 
     def Verif_Maj(self):
         self.bmaj.config(state="disabled")
@@ -242,7 +269,7 @@ class IHM(Tk, Verification, Logapli):
 
         i = self.verifReference("References2.mic", "SYMBOLES") # essai MAISON
 #        i = self.verifReference(self.log, "SYMBOLES") # essai TRAVAIL
-        j = self.verifReference("References.mic", "NSRTGV")
+        j = self.verifReference("References3.mic", "NSRTGV")
         i()
         j()
 
@@ -254,45 +281,65 @@ class IHM(Tk, Verification, Logapli):
             fini1, tab1 = j(True)
             if fini and fini1:
                 c = Compare_log_nsrtgv()
-
+                index = 0
                 def refresh():
-                    
-                    nonlocal self
-                    self.count_maj.set(c.counter)
+                    nonlocal self, index
+                    long ,comp = c.compare(tab, tab1, index)
+                    index += 1
+                    count = (index / long) * 100
+                    self.count_maj.set(count)
                     #print(self.count_maj.get())
-                    if self.count_maj.get() < 99:
-                        self.after(16, refresh)
-                refresh()
-                comp = c.compare(tab, tab1)
-                nv = comp.get("nouveau")
-                sup = comp.get("supprime")
-                dep = comp.get("deplace")
-                for valeur in comp.values():
-                    self.val_maj = self.val_maj + valeur
-
-                if self.val_maj !=0:
-                    creat = CreateXls(tab)
-                    if messagebox.askyesno("Résultat : ","Les changements suivants ont été trouvés :\n\n" +
-                                        "Nouvelle(s) pièce(s) : %s\n" %nv +
-                                        "Pièce(s) supprimée(s) : %s\n" %sup +
-                                        "Pièce(s) déplacée(s) : %s\n" %dep +
-                                        "\n \n Voulez-vous mettre à jour \n la Base De Données ? "):
-                        self.bmaj.config(state="normal")
-                        creat.creation()
-                        print(" lancer la mise a jour de la bdd + maj le fichier reference.mic")
+                    if long > index:
+                        self.after(1, refresh)
                     else:
-                        self.bmaj.config(state="normal")
-                        print(" fini....")
-                    
-                else:
-                    messagebox.showinfo("Résultat : ", "Aucun changement n'a été trouvé\n \n Il est INUTILE de mettre à jour la Base De Donéées...")
-                    self.bmaj.config(state="normal")
-                    print("Pas de MAJ a faire")
+                        print(long, comp)
+                        nv = comp.get("nouveau")
+                        sup = comp.get("supprime")
+                        dep = comp.get("deplace")
+                        for valeur in comp.values():
+                            self.val_maj = self.val_maj + valeur
+
+                        if self.val_maj !=0:
+                            creat = CreateXls(tab)
+                            if messagebox.askyesno("Résultat : ","Les changements suivants ont été trouvés :\n\n" +
+                                                "Nouvelle(s) pièce(s) : %s\n" %nv +
+                                                "Pièce(s) supprimée(s) : %s\n" %sup +
+                                                "Pièce(s) déplacée(s) : %s\n" %dep +
+                                                "\n \n Voulez-vous mettre à jour \n la Base De Données ? "):
+                                self.bmaj.config(state="normal")
+                                fin1 = creat.creation()
+                                self.count_bdd.set(50)
+                                if fin1:                                                
+                                    self.db(tab)
+                                    self.count_bdd.set(100)
+                                messagebox.showinfo("TERMINE...", " Base de Donnéés et Fichier Référence Maj")
+                                self.count_bdd.set(0)
+                                self.count_logapli.set(0)
+                                self.count_reference.set(0)
+                                self.count_maj.set(0)
+                                self.bmaj.config(state="normal")
+                            else:
+                                self.bmaj.config(state="normal")
+                            
+                        else:
+                            messagebox.showinfo("Résultat : ", "Aucun changement n'a été trouvé\n \n Il est INUTILE de mettre à jour la Base De Donéées...")
+                            self.bmaj.config(state="normal")
+                            print("Pas de MAJ a faire")
+
+                refresh()
 
             else:
                 self.after(1000, wait)
 
         return wait
+
+    def db(self, tab):
+        self.variable()
+        config = {'user': self.ids, 'password': self.mdp,
+                       'host': self.ips, 'database': self.dat}
+        bdd = BDD(tab, config)
+        bdd.effacer()
+        bdd.maj()
 
 
 
@@ -306,7 +353,7 @@ class IHM(Tk, Verification, Logapli):
             self.v.verif_param()
             self.count_verif.set(25)
         elif self.count_verif.get() == 25:
-#            self.v.verif_reseau() # A retirer pour essai MAISON
+            self.v.verif_reseau() 
             self.count_verif.set(50)
         elif self.count_verif.get() == 50:
 #            self.v.verif_logapli() # A retirer pour essai MAISON
@@ -319,7 +366,8 @@ class IHM(Tk, Verification, Logapli):
                 self.bmaj.config(state="normal")
             else:
                 self.bmaj.config(state="normal") # essai MAISON
- #               self.bmaj.config(state="disabled") # essai TRAVAIL
+#                self.bmaj.config(state="disabled") # essai TRAVAIL
+                messagebox.showwarning("PROBLEME de paramètre", "Au moins 1 de vos paramètres n'est pas VALABLE...\n Merci de les vérifier.")
             return
         elif self.count_verif.get() == 0:
             self.count_verif.set(1)
@@ -328,6 +376,7 @@ class IHM(Tk, Verification, Logapli):
             self.after(1000, self.verif)
 
     def verifReference(self, lien, name):
+        self.count_maj.set(0)
         if name == "NSRTGV":
             readRows = self.readRowsTgv
             counter = self.count_reference
@@ -362,59 +411,33 @@ class IHM(Tk, Verification, Logapli):
                     return (fini, None)
 
         return g
+    
+    def overrideredirect(self, boolean=None):
 
-#    def verifLogapli(self, lien, name):
-        #if name == "NSRTGV":
-        #    counter = self.count_reference
-        #else:
-#        counter = self.count_logapli
+        Tk.overrideredirect(self, boolean)
+        GWL_EXSTYLE = -20
+        WS_EX_APPWINDOW = 0x00040000
+        WS_EX_TOOLWINDOW = 0x00000080
+        if boolean:
+            hwnd = windll.user32.GetParent(self.winfo_id())
+            style = windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
+            style = style & ~WS_EX_TOOLWINDOW
+            style = style | WS_EX_APPWINDOW
+            res = windll.user32.SetWindowLongW(hwnd, GWL_EXSTYLE, style)
 
-#        self.logapli.lien_logapli = lien
-#        ws = self.logapli.sheetName(name)
-#        tab = []
-#        ligne = 1
-        #print(name, ws.nrows)
+        self.wm_withdraw()
+        self.wm_deiconify()
 
-#        fini = False
-
-#        def g():
-#            nonlocal ws, ligne, tab, fini
-#            if not fini:
-#                if ligne < ws.nrows:
-#                    tab = self.logapli.readRowsLog(ws, ligne, tab)
-#                    counter.set((ligne / ws.nrows) * 100)
-#                    ligne += 1
-                    #print("Ligne : ", ligne)
-#                    self.after(1, g)
-#                else:
-#                    fini = True
-#                    print(" jai fini logapli....", fini)
-#            else:
-#                if fini:
-#                    print("ligne 370", fini)
-#                    return (fini, tab)
-#                else:
-#                    print("ligne 373", fini)
-#                    return (fini, None)
-
-#        return g
-
-#    def verifref(self, lien1, name1):
-#
-#        self.lien, self.name = lien1, name1
-        #print(self.lien, self.name)
-#        self.verifReference(self.lien, self.name)
-
-        # return self.tab
 
 
 ihm = IHM(None)
+
+ihm.overrideredirect(True)
+# self.attributes("-toolwindow", 1)
+
+ihm.overrideredirect()
+
 ihm.verif()
-
-# ihm.verifLogapli()
-
-#v = ihm.Verif_Maj()
-#v()
 
 
 ihm.mainloop()

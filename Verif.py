@@ -12,7 +12,8 @@ class Verification():
 
     def verif_param(self):
         try:
-            f = open("param", "r")
+#            f = open("param", "r") # essai TRAVAIL
+            f = open("param", "r") # essai MAISON
             lignes = f.readlines()
             print("Ouverture param")
             f.close

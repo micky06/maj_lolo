@@ -42,7 +42,7 @@ class CreateXls():
         self.feuille.col(4).width = 2400
         # remplissage du tableau
  
-        for ligne,v in enumerate(self.tab[1:]):
+        for ligne,v in enumerate(self.tab):
             if v['bdl'] == "yes":
                 STYLE = self.style3
             else:
@@ -61,3 +61,4 @@ class CreateXls():
             print(""" Veuillez fermer le fichier "References.mic"....""")
 
         print("creation du fichier EXCEL terminé....")
+        return True

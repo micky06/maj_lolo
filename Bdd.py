@@ -1,45 +1,35 @@
+
+import mysql.connector
 # ************************************************************************
 # **************** MAJ DE LA BASE DE DONNEES MYSQL ***********************
 #*************************************************************************
 
-class DB():
+class BDD():
 
-    def __init__(self, logapli):
-        self.logapli = logapli
-        self.config = {'user': 'root', 'password': 'r00t',
-                       'host': '10.6.13.18', 'database': 'pieces'}
+    def __init__(self, tab,config = None):
+        self.tab = tab
         self.query = ""
-        self.conn = mysql.connector.connect(**self.config)
+        self.conn = mysql.connector.connect(**config)
         self.cursor = self.conn.cursor()
         self.nouveau = ""
 
     def __enter__(self):
         # Si ça ne fonctionne pas, alors mettre : 
         # return DB(logapli)
-        return DB(self.logapli)
+        return BDD(tab)
 
-    # def getAll(self):
-    #     self.cursor.execute(self.query)
-    #     return self.cursor.fetchall()
-
-    # def getOne(self):
-    #     self.cursor.execute(self.query)
-    #     return self.cursor.fetchone()
-
-    # def boucleGetAll(self, args):
-    #     for (id, symbole, nom) in args:
-    #         print('{0} : {1} : {2}'.format(id, symbole, nom))
-
+ 
     def effacer(self):
-        self.cursor.execute(self.query)
+        self.cursor.execute("""TRUNCATE TABLE logappli""")
         self.conn.commit()
+        #self.cursor.execute("""CREATE TABLE logappli(id INTEGER PRIMARY KEY, zone TEXT, symbole TEXT, nom TEXT, emplacement TEXT, bdl TEXT);""")
+        #self.conn.commit()
+
         print(".... TABLE EFFACEE.....")
 
     def maj(self):
-        x = 0
-        for x in range(self.logapli.nbr()):
-            Zone, Symbole, Nom, Emplacement, Bdl = self.logapli.zone[x], self.logapli.symbole[
-                x], self.logapli.nom[x], self.logapli.emplacement[x], self.logapli.bdl[x]
+        for x,v in enumerate(self.tab[1:]):
+            Zone, Symbole, Nom, Emplacement, Bdl =  v['zone'],  v['symbole'], v['nom'],  v['emplacement'],  v['bdl']
 
             valeurs = (Zone, Symbole, Nom, Emplacement, Bdl)
 
