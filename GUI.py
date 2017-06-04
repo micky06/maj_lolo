@@ -10,7 +10,7 @@ from Reference import *
 from Bdd import *
 import time
 import asyncio
-import image_base_64
+
 from ctypes import windll
 
 
@@ -24,7 +24,7 @@ class IHM(Tk, Verification, Logapli):
         """ Icon Windows app"""
         img = PhotoImage(file=r'img/icon.png')
         self.tk.call('wm', 'iconphoto', self._w, img)
-        
+
         Verification.__init__(self)
         Logapli.__init__(self)
         self.parent = parent
@@ -33,7 +33,6 @@ class IHM(Tk, Verification, Logapli):
         self.etat = "disabled"
         self.vpb = 1
         self.list_log = []
-
 
         self.v = Verification()
         self.nsrtgv = Logapli()
@@ -65,7 +64,7 @@ class IHM(Tk, Verification, Logapli):
 
         self.marge(0)
         self.bmaj = Button(self, text=" Verifier la Maj", width=int(self.l // 70),
-                           height=2, relief=RAISED, state=self.etat, command= self.bouton)
+                           height=2, relief=RAISED, state=self.etat, command=self.bouton)
         self.bmaj.grid(row=16, column=1, sticky='WE', padx=3, pady=5)
         self.marge(2)
         bparam = Button(self, text=" Parametre", width=int(self.l // 70),
@@ -99,10 +98,10 @@ class IHM(Tk, Verification, Logapli):
         self.ligne(13)
         self.ligne(14)
 
-
     def bouton(self):
         v = self.Verif_Maj()
-        v() 
+        v()
+
     def marge(self, column):
         Label(self, text=' ', width=int(self.l // 100)
               ).grid(row=0, column=column, sticky='EW')
@@ -114,20 +113,18 @@ class IHM(Tk, Verification, Logapli):
     def titre(self, line, titre):
         Label(self, text=titre, font=("Arial", int(self.l // 100),
                                       "bold italic")).grid(row=line, column=0, columnspan=3, sticky=EW)
-    
+
     def logo(self):
-        logo_png = PhotoImage(file ="deployment.gif")
+        logo_png = PhotoImage(file="deployment.gif")
         photo = Label(self, image=logo_png)
         photo.image = logo_png
         photo.grid(row=1, column=1, rowspan=2)
-    
+
     def logo_tgv(self):
-        logo_png = PhotoImage(file ="tgv_duplex.gif")
+        logo_png = PhotoImage(file="tgv_duplex.gif")
         photo = Label(self, image=logo_png)
         photo.image = logo_png
         photo.grid(row=2, column=3, columnspan=2)
-
-
 
     def progress_bar(self, line, name):
 
@@ -258,7 +255,8 @@ class IHM(Tk, Verification, Logapli):
             self.bmaj.config(state="normal")
             self.Fermer()
         else:
-            messagebox.showerror("PROBLEME de paramètre", "Au moins 1 de vos paramètres n'est pas VALABLE...\n Merci de les vérifier.", parent=self.fen1)
+            messagebox.showerror(
+                "PROBLEME de paramètre", "Au moins 1 de vos paramètres n'est pas VALABLE...\n Merci de les vérifier.", parent=self.fen1)
             self.Fermer()
             self.param()
         return
@@ -267,28 +265,28 @@ class IHM(Tk, Verification, Logapli):
         self.bmaj.config(state="disabled")
         self.val_maj = 0
 
-        i = self.verifReference("References2.mic", "SYMBOLES") # essai MAISON
+        i = self.verifReference("References2.mic", "SYMBOLES")  # essai MAISON
 #        i = self.verifReference(self.log, "SYMBOLES") # essai TRAVAIL
         j = self.verifReference("References3.mic", "NSRTGV")
         i()
         j()
 
-
         def wait():
-            
+
             nonlocal i, j
             fini, tab = i(True)
             fini1, tab1 = j(True)
             if fini and fini1:
                 c = Compare_log_nsrtgv()
                 index = 0
+
                 def refresh():
                     nonlocal self, index
-                    long ,comp = c.compare(tab, tab1, index)
+                    long, comp = c.compare(tab, tab1, index)
                     index += 1
                     count = (index / long) * 100
                     self.count_maj.set(count)
-                    #print(self.count_maj.get())
+                    # print(self.count_maj.get())
                     if long > index:
                         self.after(1, refresh)
                     else:
@@ -299,30 +297,26 @@ class IHM(Tk, Verification, Logapli):
                         for valeur in comp.values():
                             self.val_maj = self.val_maj + valeur
 
-                        if self.val_maj !=0:
+                        if self.val_maj != 0:
                             creat = CreateXls(tab)
-                            if messagebox.askyesno("Résultat : ","Les changements suivants ont été trouvés :\n\n" +
-                                                "Nouvelle(s) pièce(s) : %s\n" %nv +
-                                                "Pièce(s) supprimée(s) : %s\n" %sup +
-                                                "Pièce(s) déplacée(s) : %s\n" %dep +
-                                                "\n \n Voulez-vous mettre à jour \n la Base De Données ? "):
+                            if messagebox.askyesno("Résultat : ", "Les changements suivants ont été trouvés :\n\n" +
+                                                   "Nouvelle(s) pièce(s) : %s\n" % nv +
+                                                   "Pièce(s) supprimée(s) : %s\n" % sup +
+                                                   "Pièce(s) déplacée(s) : %s\n" % dep +
+                                                   "\n \n Voulez-vous mettre à jour \n la Base De Données ? "):
                                 self.bmaj.config(state="normal")
                                 fin1 = creat.creation()
                                 self.count_bdd.set(50)
-                                if fin1:                                                
+                                if fin1:
                                     self.db(tab)
-                                    self.count_bdd.set(100)
-                                messagebox.showinfo("TERMINE...", " Base de Donnéés et Fichier Référence Maj")
-                                self.count_bdd.set(0)
-                                self.count_logapli.set(0)
-                                self.count_reference.set(0)
-                                self.count_maj.set(0)
-                                self.bmaj.config(state="normal")
+                                    self.wait2()
+                                    
                             else:
                                 self.bmaj.config(state="normal")
-                            
+
                         else:
-                            messagebox.showinfo("Résultat : ", "Aucun changement n'a été trouvé\n \n Il est INUTILE de mettre à jour la Base De Donéées...")
+                            messagebox.showinfo(
+                                "Résultat : ", "Aucun changement n'a été trouvé\n \n Il est INUTILE de mettre à jour la Base De Donéées...")
                             self.bmaj.config(state="normal")
                             print("Pas de MAJ a faire")
 
@@ -333,15 +327,35 @@ class IHM(Tk, Verification, Logapli):
 
         return wait
 
+    def wait2 (self):
+        if self.count_bdd.get() == 100:
+            messagebox.showinfo(
+                "TERMINE...", " Base de Donnéés et Fichier Référence Maj")
+            self.count_bdd.set(0)
+            self.count_logapli.set(0)
+            self.count_reference.set(0)
+            self.count_maj.set(0)
+            self.bmaj.config(state="normal")
+        else:
+            self.after(100,self.wait2)
+
     def db(self, tab):
         self.variable()
         config = {'user': self.ids, 'password': self.mdp,
-                       'host': self.ips, 'database': self.dat}
+                  'host': self.ips, 'database': self.dat}
         bdd = BDD(tab, config)
         bdd.effacer()
-        bdd.maj()
+        index = 0
 
-
+        def refresh():
+            nonlocal self, index
+            long = bdd.maj(index)
+            index += 1
+            count = 50 + (index / long) * 50
+            self.count_bdd.set(count)
+            if long > index:
+                self.after(1, refresh)
+        refresh()
 
     def Fermer(self):
         self.f1 = True
@@ -353,10 +367,10 @@ class IHM(Tk, Verification, Logapli):
             self.v.verif_param()
             self.count_verif.set(25)
         elif self.count_verif.get() == 25:
-            self.v.verif_reseau() 
+            self.v.verif_reseau()
             self.count_verif.set(50)
         elif self.count_verif.get() == 50:
-#            self.v.verif_logapli() # A retirer pour essai MAISON
+            #            self.v.verif_logapli() # A retirer pour essai MAISON
             self.count_verif.set(75)
         elif self.count_verif.get() == 75:
             self.v.verif_reference()
@@ -365,9 +379,10 @@ class IHM(Tk, Verification, Logapli):
             if self.v.Controle == 3:
                 self.bmaj.config(state="normal")
             else:
-                self.bmaj.config(state="normal") # essai MAISON
+                self.bmaj.config(state="normal")  # essai MAISON
 #                self.bmaj.config(state="disabled") # essai TRAVAIL
-                messagebox.showwarning("PROBLEME de paramètre", "Au moins 1 de vos paramètres n'est pas VALABLE...\n Merci de les vérifier.")
+                messagebox.showwarning(
+                    "PROBLEME de paramètre", "Au moins 1 de vos paramètres n'est pas VALABLE...\n Merci de les vérifier.")
             return
         elif self.count_verif.get() == 0:
             self.count_verif.set(1)
@@ -381,7 +396,7 @@ class IHM(Tk, Verification, Logapli):
             readRows = self.readRowsTgv
             counter = self.count_reference
         else:
-            readRows = self.readRowsTgv # essai MAISON
+            readRows = self.readRowsTgv  # essai MAISON
  #           readRows = self.readRowsLog # essai TRAVAIL
             counter = self.count_logapli
 
@@ -406,12 +421,12 @@ class IHM(Tk, Verification, Logapli):
             else:
                 if fini:
                     return (fini, tab)
-                    
+
                 else:
                     return (fini, None)
 
         return g
-    
+
     def overrideredirect(self, boolean=None):
 
         Tk.overrideredirect(self, boolean)
@@ -427,7 +442,6 @@ class IHM(Tk, Verification, Logapli):
 
         self.wm_withdraw()
         self.wm_deiconify()
-
 
 
 ihm = IHM(None)
