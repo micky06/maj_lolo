@@ -64,18 +64,3 @@ class Compare_log_nsrtgv(object):
                     count -= 1
                     break
         return count
-
-
-# nsrtgv = Logapli()
-# logapli = Logapli()
-
-
-# logapli.lien_logapli = "References.mic"
-# nsrtgv.lien_logapli = "References2.mic"
-
-# list_log = logapli.readRowsTgv('NSRTGV')
-# tgv = nsrtgv.readRowsTgv('NSRTGV')
-
-# # print(tgv)
-# comp = Compare_log_nsrtgv()
-# print(comp.compare(list_log, tgv))

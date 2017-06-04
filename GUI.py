@@ -10,7 +10,7 @@ from Reference import *
 from Bdd import *
 import time
 import asyncio
-
+import os
 from ctypes import windll
 
 
@@ -22,7 +22,7 @@ class IHM(Tk, Verification, Logapli):
         Tk.__init__(self, parent)
 
         """ Icon Windows app"""
-        img = PhotoImage(file=r'img/icon.png')
+        img = PhotoImage(file = r'img/icon3.png')
         self.tk.call('wm', 'iconphoto', self._w, img)
 
         Verification.__init__(self)
@@ -53,6 +53,7 @@ class IHM(Tk, Verification, Logapli):
         self.grid()
 
         self.title('Mise à Jour de la Borne')  # Ajout d'un titre
+        self.iconbitmap("img/train.ico")
         self.update_idletasks()
         width = self.winfo_screenwidth()
         height = self.winfo_screenheight()
@@ -115,13 +116,13 @@ class IHM(Tk, Verification, Logapli):
                                       "bold italic")).grid(row=line, column=0, columnspan=3, sticky=EW)
 
     def logo(self):
-        logo_png = PhotoImage(file="deployment.gif")
+        logo_png = PhotoImage(file="img/deployment.gif")
         photo = Label(self, image=logo_png)
         photo.image = logo_png
         photo.grid(row=1, column=1, rowspan=2)
 
     def logo_tgv(self):
-        logo_png = PhotoImage(file="tgv_duplex.gif")
+        logo_png = PhotoImage(file="img/tgv_duplex.gif")
         photo = Label(self, image=logo_png)
         photo.image = logo_png
         photo.grid(row=2, column=3, columnspan=2)
@@ -168,9 +169,10 @@ class IHM(Tk, Verification, Logapli):
 
             self.f1 = False
             self.fen1 = Toplevel(self)
+            self.fen1.iconbitmap(default = 'img/gear.ico')
             self.fen1.protocol("WM_DELETE_WINDOW", self.Fermer)
-            # self.fen1.attributes("-toolwindow", 1)
-
+            self.fen1.attributes("-toolwindow", 1)
+            
             self.fen1.title('Paramètres')
             self.fen1.update_idletasks()
             l, h, x, y = self.geoliste(self.fen1.geometry())
