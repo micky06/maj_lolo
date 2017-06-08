@@ -1,9 +1,8 @@
-
-
-import mysql.connector
+import _mysql
 import os
 import time
 #from GUI import *
+
 
 class Verification():
 
@@ -12,8 +11,8 @@ class Verification():
 
     def verif_param(self):
         try:
-#            f = open("param", "r") # essai TRAVAIL
-            f = open("param", "r") # essai MAISON
+            #            f = open("param", "r") # essai TRAVAIL
+            f = open("param", "r")  # essai MAISON
             lignes = f.readlines()
             print("Ouverture param")
             f.close
@@ -35,16 +34,17 @@ class Verification():
             params = []
             for ligne in lignes:
                 params.append(ligne[:-1])
-            #print(params)
+            # print(params)
             self.log = r'%s' % params[0]
             self.ips = params[1]
             self.ids = params[2]
             self.mdp = params[3]
             self.dat = params[4]
             self.Controle += 1
-            
+
             print("Récupération des parametres")
-        liimd = [self.log, self.ips, self.ids, self.mdp, self.dat, self.Controle]
+        liimd = [self.log, self.ips, self.ids,
+                 self.mdp, self.dat, self.Controle]
         return liimd
 
 
@@ -53,10 +53,11 @@ class Verification():
 # ************************************************************************
 
     def verif_reseau(self):
-        self.config = {'user': self.ids, 'password': self.mdp, 'host': self.ips, 'database': self.dat}
-        #print(self.config)
+        self.config = {'user': self.ids, 'password': self.mdp,
+                       'host': self.ips, 'database': self.dat}
+        # print(self.config)
         try:
-            cnx = mysql.connector.connect(**self.config)
+            cnx = _mysql.connect(**self.config)
             cur = cnx.cursor(buffered=True)
             cur.close()
             cnx.close()
@@ -91,4 +92,3 @@ class Verification():
         else:
             # prevoir la creation du fichier
             print(" Fichier référence MANQUANT..")
-
