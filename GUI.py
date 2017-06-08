@@ -23,7 +23,7 @@ class IHM(Tk, Verification, Logapli):
         Tk.__init__(self, parent)
 
         """ Icon Windows app"""
-        img = PhotoImage(file = r'img/icon3.png')
+        img = PhotoImage(file = r'img/icon.png')
         self.tk.call('wm', 'iconphoto', self._w, img)
 
         Verification.__init__(self)
@@ -238,7 +238,7 @@ class IHM(Tk, Verification, Logapli):
             Label(self.fen1, text='').grid(row=16, column=1, sticky=E)
             Label(self.fen1, text='').grid(row=17, column=1, sticky=E)
 
-            valid = Button(self.fen1, text="Vailder", relief=RAISED,
+            valid = Button(self.fen1, text="Valider", relief=RAISED,
                            command=self.validation)
             anull = Button(self.fen1, text="QUITTER",
                            relief=RAISED, command=self.Fermer)
@@ -272,7 +272,7 @@ class IHM(Tk, Verification, Logapli):
         self.bmaj.config(state="disabled")
         self.val_maj = 0
 
-#        i = self.verifReference("References2.mic", "SYMBOLES")  # essai MAISON
+        # i = self.verifReference("References3.mic", "SYMBOLES")  # essai MAISON
         i = self.verifReference(self.log, "SYMBOLES") # essai TRAVAIL
         j = self.verifReference("References.mic", "NSRTGV")
         i()
@@ -415,7 +415,7 @@ class IHM(Tk, Verification, Logapli):
             readRows = self.readRowsTgv
             counter = self.count_reference
         else:
-#            readRows = self.readRowsTgv  # essai MAISON
+            # readRows = self.readRowsTgv  # essai MAISON
             readRows = self.readRowsLog # essai TRAVAIL
             counter = self.count_logapli
 

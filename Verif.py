@@ -1,4 +1,4 @@
-import _mysql
+import MySQLdb
 import os
 import time
 #from GUI import *
@@ -55,10 +55,9 @@ class Verification():
     def verif_reseau(self):
         self.config = {'user': self.ids, 'password': self.mdp,
                        'host': self.ips, 'database': self.dat}
-        # print(self.config)
         try:
-            cnx = _mysql.connect(**self.config)
-            cur = cnx.cursor(buffered=True)
+            cnx = MySQLdb.connect(**self.config)
+            cur = cnx.cursor()
             cur.close()
             cnx.close()
             print("Serveur : OK")

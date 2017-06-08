@@ -9,8 +9,7 @@ class Compare_log_nsrtgv(object):
 
     def compare(self, list_log, list_nsrtgv, index):
         long = len(list_nsrtgv), len(list_log)
-        #print("longueur au depard =   ", long)
-        # for i, l in enumerate(list_log):
+
         l = list_log[index]
         ok, lign = self.boucle(list_nsrtgv, l)
         if not ok:
