@@ -8,6 +8,7 @@ from Logapli import *
 from Compare import *
 from Reference import *
 from Bdd import *
+from controle import *
 import time
 import asyncio
 import os
@@ -33,7 +34,11 @@ class IHM(Tk, Verification, Logapli):
         self.etat = "disabled"
         self.vpb = 1
         self.list_log = []
-
+        self.log = ""
+        self.ips = ""
+        self.ids = ""
+        self.mdp = ""
+        self.dat = ""
         self.v = Verification()
         self.nsrtgv = Logapli()
         self.logapli = Logapli()
@@ -267,9 +272,9 @@ class IHM(Tk, Verification, Logapli):
         self.bmaj.config(state="disabled")
         self.val_maj = 0
 
-        i = self.verifReference("References2.mic", "SYMBOLES")  # essai MAISON
-#        i = self.verifReference(self.log, "SYMBOLES") # essai TRAVAIL
-        j = self.verifReference("References3.mic", "NSRTGV")
+#        i = self.verifReference("References2.mic", "SYMBOLES")  # essai MAISON
+        i = self.verifReference(self.log, "SYMBOLES") # essai TRAVAIL
+        j = self.verifReference("References.mic", "NSRTGV")
         i()
         j()
 
@@ -332,7 +337,13 @@ class IHM(Tk, Verification, Logapli):
     def wait2 (self):
         if self.count_bdd.get() == 100:
             messagebox.showinfo(
-                "TERMINE...", " Base de Donnéés et Fichier Référence Maj")
+                    "TERMINE...", " Base de Donnéés et Fichier Référence Maj\n Veuillez cliquer sur OK pour que\n la Borne lance son auto-contrôle")
+            cont = action_borne()
+            affcont = cont.act_bor(self.ips)
+            if affcont:
+                messagebox.showinfo("Contrôle", "auto-contrôle terminé avec succès ")
+            else:
+                messagebox.showinfo("Contrôle", "Une erreur est survenue lors de l'auto-contrôle\n Merci de lancer l'auto-contrôle manuellement\n depuis la Borne")
             self.count_bdd.set(0)
             self.count_logapli.set(0)
             self.count_reference.set(0)
@@ -366,13 +377,19 @@ class IHM(Tk, Verification, Logapli):
 
     def verif(self):
         if self.count_verif.get() == 1:
-            self.v.verif_param()
+            liimd = self.v.verif_param()
+            self.log = liimd[0]
+            self.ips = liimd[1]
+            self.ids = liimd[2]
+            self.mdp = liimd[3]
+            self.dat = liimd[4]
+#            self.v.verif_param()
             self.count_verif.set(25)
         elif self.count_verif.get() == 25:
             self.v.verif_reseau()
             self.count_verif.set(50)
         elif self.count_verif.get() == 50:
-            #            self.v.verif_logapli() # A retirer pour essai MAISON
+            self.v.verif_logapli() # A retirer pour essai MAISON
             self.count_verif.set(75)
         elif self.count_verif.get() == 75:
             self.v.verif_reference()
@@ -381,8 +398,8 @@ class IHM(Tk, Verification, Logapli):
             if self.v.Controle == 3:
                 self.bmaj.config(state="normal")
             else:
-                self.bmaj.config(state="normal")  # essai MAISON
-#                self.bmaj.config(state="disabled") # essai TRAVAIL
+#                self.bmaj.config(state="normal")  # essai MAISON
+                self.bmaj.config(state="disabled") # essai TRAVAIL
                 messagebox.showwarning(
                     "PROBLEME de paramètre", "Au moins 1 de vos paramètres n'est pas VALABLE...\n Merci de les vérifier.")
             return
@@ -398,8 +415,8 @@ class IHM(Tk, Verification, Logapli):
             readRows = self.readRowsTgv
             counter = self.count_reference
         else:
-            readRows = self.readRowsTgv  # essai MAISON
- #           readRows = self.readRowsLog # essai TRAVAIL
+#            readRows = self.readRowsTgv  # essai MAISON
+            readRows = self.readRowsLog # essai TRAVAIL
             counter = self.count_logapli
 
         self.logapli.lien_logapli = lien

@@ -40,15 +40,16 @@ class Logapli(object):
             self.zone.append(self.zonage.get(
                 format(ws.cell_value(ligne, 3))))
             if "BTGV" in x:
-                self.bdl.append("yes")
+                d['bdl'] = "yes"
             else:
-                self.bdl.append("no")
+                d['bdl'] = "no"
 
             d['symbole'] = ws.cell_value(ligne, 0)[0:8]
             d['nom'] = ws.cell_value(ligne, 1)
             d['emplacement'] = ws.cell_value(ligne, 4)
-            d['zone'] = ws.cell_value(ligne, 3)
-            d['bdl'] = self.bdl[0]
+            d['zone'] = self.zonage.get(
+                format(ws.cell_value(ligne, 3)))
+            #d['bdl'] = self.bdl[x]
             tab.append(d)
 
         #print("... RECUPERATION TERMINEE logapli.......")

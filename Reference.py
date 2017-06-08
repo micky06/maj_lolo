@@ -55,7 +55,7 @@ class CreateXls():
                 ligne + 1, 3, v['emplacement'], STYLE)
             self.feuille.write(ligne + 1, 4, v['bdl'], STYLE)
         try:
-            self.classeur.save("References3.mic")
+            self.classeur.save("References.mic")
         except PermissionError:
 
             print(""" Veuillez fermer le fichier "References.mic"....""")
