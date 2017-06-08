@@ -28,7 +28,7 @@ cx_Freeze.setup(
             os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tcl86t.dll'),
             "img/",
         ]}},
-    author="Mick",
+    author="SaMick",
     version="0.1.0",
     description="Mettre a jour la borne Logapli",
     executables=executables
