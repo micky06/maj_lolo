@@ -1,5 +1,5 @@
 
-import mysql.connector
+import _mysql
 # ************************************************************************
 # **************** MAJ DE LA BASE DE DONNEES MYSQL ***********************
 #*************************************************************************
@@ -10,7 +10,7 @@ class BDD():
     def __init__(self, tab, config=None):
         self.tab = tab
         self.query = ""
-        self.conn = mysql.connector.connect(**config)
+        self.conn = _mysql.connect(**config)
         self.cursor = self.conn.cursor()
         self.nouveau = ""
 
